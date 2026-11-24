@@ -4,6 +4,10 @@
 
 Eternal Ltd is the listed parent (renamed from Zomato Ltd in 2025). It runs four businesses: **Zomato** (food delivery + dining), **Blinkit** (quick commerce, 10-minute delivery from dark stores), **District** (going out: movies, events, dining reservations), and **Hyperpure** (B2B supplies to restaurants). Blinkit is now the largest business by order value and the main growth engine; food delivery is the mature, profitable cash engine.
 
+**Leadership change to know:** In January 2026, founder Deepinder Goyal announced he would step down as Group CEO, with Blinkit CEO Albinder Dhindsa taking over day-to-day leadership of food delivery and quick commerce ([Business Today](https://www.businesstoday.in/technology/news/story/eternal-founder-deepinder-goyal-to-return-unvested-esops-as-he-steps-down-as-ceo-512069-2026-01-21)). Verify the current titles before mentioning anyone by role.
+
+**Primary source to read:** [Q2 FY27 shareholders' letter (NSE filing, 21 Oct 2026)](https://nsearchives.nseindia.com/corporate/ZOMATO_21102026152512_SHLsigned.pdf).
+
 ## Latest numbers: Q2 FY27 (quarter ended September 2026, reported 21 October 2026)
 
 Verify each against the official shareholder letter before quoting. Figures below are from news coverage.

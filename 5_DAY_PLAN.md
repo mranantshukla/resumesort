@@ -4,6 +4,8 @@
 **Budget:** ~7 focused hours/day = 35 hours. Sleep 7+ hours every night; it matters more than one extra hour of study.
 **Rule:** Everything is practised **out loud**. Reading is not preparation. Speaking is.
 
+**Videos, blogs, PDFs and practice sites for each day:** [Interview_Guide/06_resources.md](Interview_Guide/06_resources.md).
+
 This plan replaces the 4-week schedule in [masterplan.md](masterplan.md). Everything it points to is already in this repo.
 
 | Day | Theme | Hours |

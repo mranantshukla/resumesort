@@ -9,6 +9,7 @@ The research layer of this repo. [masterplan.md](../masterplan.md) is the schedu
 | [03_round_playbooks.md](03_round_playbooks.md) | How to excel in each round: SQL, stats, guesstimate, RCA case, product sense, HR. Worked examples |
 | [04_resume_defense.md](04_resume_defense.md) | Line-by-line resume defense: the attack question, the trap, the answer skeleton |
 | [05_question_bank.md](05_question_bank.md) | 120+ practice questions grouped by round, with priority |
+| [06_resources.md](06_resources.md) | Videos, blogs, free PDFs, books and practice sites, mapped to each day of the 5-day plan |
 
 ## The research in one page
 
