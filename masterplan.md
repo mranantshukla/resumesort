@@ -25,6 +25,8 @@ Rule for every answer in the interview: name the user, name the metric, name the
 
 Full JD-to-resume mapping: [JD.md](JD.md#jd-to-resume-mapping).
 
+> **Update: OA cleared. Interview in 5 days. Follow [5_DAY_PLAN.md](5_DAY_PLAN.md).** The 4-week schedule in section 3 is kept for reference only.
+
 **Start here:** [Interview_Guide/](Interview_Guide/README.md) has the research: rounds and OA format from past candidates, round-by-round playbooks with worked examples, line-by-line resume defense, Eternal's latest numbers, and a 120-question bank.
 
 | Folder | What it covers | Plan |
