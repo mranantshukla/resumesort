@@ -1,0 +1,840 @@
+<title>Food Delivery Metrics Lab</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: a lab notebook. Sticky section nav, an atlas of metric cards, then four hands-on simulators and a quiz. */
+:root {
+  --bg: #f3f5f7;
+  --surface: #ffffff;
+  --surface-2: #eaf0f2;
+  --ink: #13202a;
+  --muted: #566573;
+  --line: #d8e0e6;
+  --accent: #0e7468;        /* teal, matches the source table */
+  --accent-ink: #ffffff;
+  --spice: #a8650a;          /* turmeric, for Zomato-specific add-ons */
+  --spice-soft: #fbf1df;
+  --good: #187a3c;
+  --bad: #b42318;
+  --warn: #9a6200;
+  --font-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --font-body: "Inter", "Segoe UI", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  --radius: 10px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0e1418; --surface: #161f25; --surface-2: #1d2a31; --ink: #e5edf1; --muted: #9bacb8;
+    --line: #283741; --accent: #34c3b0; --accent-ink: #062520; --spice: #f0b24a; --spice-soft: #2d2413;
+    --good: #4ccb7a; --bad: #ff7a6b; --warn: #f0b24a; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0e1418; --surface: #161f25; --surface-2: #1d2a31; --ink: #e5edf1; --muted: #9bacb8;
+  --line: #283741; --accent: #34c3b0; --accent-ink: #062520; --spice: #f0b24a; --spice-soft: #2d2413;
+  --good: #4ccb7a; --bad: #ff7a6b; --warn: #f0b24a; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font-family: var(--font-body); font-size: 15px; line-height: 1.55; }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--surface); }
+.wrap { max-width: 1120px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+h1, h2, h3 { font-family: var(--font-display); text-wrap: balance; line-height: 1.15; margin: 0; }
+h1 { font-size: clamp(2rem, 5vw, 3.1rem); font-weight: 700; letter-spacing: -0.02em; }
+h2 { font-size: clamp(1.45rem, 3vw, 1.9rem); font-weight: 700; letter-spacing: -0.01em; }
+h3 { font-size: 1.1rem; font-weight: 700; }
+p { margin: 0; }
+a { color: var(--accent); }
+code, .mono { font-family: var(--font-mono); font-size: 0.86em; }
+.eyebrow { font-size: 0.74rem; letter-spacing: 0.09em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+
+/* Nav */
+.nav { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--surface); border-bottom: 1px solid var(--line); }
+.nav .wrap { display: flex; gap: 6px; align-items: center; overflow-x: auto; padding-block: 10px; scrollbar-width: none; }
+.nav .brand { font-family: var(--font-display); font-weight: 700; margin-right: 10px; white-space: nowrap; }
+.nav a { text-decoration: none; color: var(--ink); padding: 6px 11px; border-radius: 999px; white-space: nowrap; font-size: 0.88rem; }
+.nav a:hover, .nav a:focus-visible { background: var(--surface-2); outline: none; }
+
+/* Hero */
+.hero { padding-block: 44px 26px; display: grid; gap: 14px; }
+.hero p.lede { max-width: 68ch; color: var(--muted); font-size: 1.05rem; }
+.legend { display: flex; flex-wrap: wrap; gap: 10px; font-size: 0.85rem; color: var(--muted); }
+.pill { display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px; border-radius: 999px; font-size: 0.75rem; font-weight: 600; letter-spacing: 0.02em; }
+.pill.base { background: var(--surface-2); color: var(--ink); }
+.pill.z { background: var(--spice-soft); color: var(--spice); }
+
+section.block { padding-block: 34px; border-top: 1px solid var(--line); }
+.sec-head { display: grid; gap: 8px; margin-bottom: 20px; }
+.sec-head p { color: var(--muted); max-width: 70ch; }
+
+/* Tree */
+.tree { overflow-x: auto; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 18px; }
+.tree-grid { display: grid; grid-template-columns: repeat(4, minmax(170px, 1fr)); gap: 12px; min-width: 760px; }
+.tnode { border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; background: var(--bg); }
+.tnode b { display: block; font-family: var(--font-display); }
+.tnode span { font-size: 0.82rem; color: var(--muted); }
+.tnode.top { border-color: var(--accent); }
+.tcol { display: grid; gap: 10px; align-content: start; }
+.tcol .eyebrow { margin-bottom: 2px; }
+
+/* Atlas */
+.filters { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 14px; }
+.chip { border: 1px solid var(--line); background: var(--surface); color: var(--ink); padding: 6px 12px; border-radius: 999px; font: inherit; font-size: 0.84rem; cursor: pointer; }
+.chip[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+.chip:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible, summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.search-row { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; margin-bottom: 18px; }
+.search-row input[type="search"] { flex: 1 1 240px; min-width: 0; padding: 10px 12px; border-radius: 8px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); font: inherit; }
+.toggle { display: inline-flex; gap: 8px; align-items: center; font-size: 0.88rem; color: var(--muted); }
+.count { font-size: 0.85rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+.atlas { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 12px; align-items: start; }
+.cat-group { grid-column: 1 / -1; display: flex; align-items: baseline; gap: 10px; margin-top: 10px; }
+.cat-group h3 { font-size: 1.05rem; }
+.cat-group span { color: var(--muted); font-size: 0.82rem; }
+details.metric { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); min-width: 0; }
+details.metric.z { border-left: 3px solid var(--spice); }
+details.metric summary { list-style: none; cursor: pointer; padding: 12px 14px; display: grid; gap: 4px; }
+details.metric summary::-webkit-details-marker { display: none; }
+details.metric summary .row { display: flex; justify-content: space-between; gap: 8px; align-items: center; }
+details.metric summary .name { font-weight: 600; }
+details.metric summary .tells { color: var(--muted); font-size: 0.88rem; }
+details.metric summary .chev { color: var(--muted); transition: transform .15s; font-size: 0.8rem; }
+details.metric[open] summary .chev { transform: rotate(90deg); }
+.mbody { padding: 0 14px 14px; display: grid; gap: 10px; }
+.mbody .lbl { font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); font-weight: 600; margin-bottom: 2px; }
+.formula { font-family: var(--font-mono); font-size: 0.82rem; background: var(--surface-2); padding: 8px 10px; border-radius: 6px; overflow-x: auto; }
+.mbody .trap { color: var(--bad); }
+.mbody .q { font-style: italic; }
+.empty { grid-column: 1 / -1; color: var(--muted); padding: 20px 0; }
+
+/* Labs */
+.lab { display: grid; grid-template-columns: minmax(0, 340px) minmax(0, 1fr); gap: 18px; }
+@media (max-width: 860px) { .lab { grid-template-columns: 1fr; } }
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 16px; min-width: 0; }
+.controls { display: grid; gap: 12px; }
+.ctl { display: grid; gap: 4px; }
+.ctl label { display: flex; justify-content: space-between; gap: 8px; font-size: 0.86rem; }
+.ctl label output { font-family: var(--font-mono); font-size: 0.82rem; color: var(--accent); font-variant-numeric: tabular-nums; }
+input[type="range"] { width: 100%; accent-color: var(--accent); }
+input[type="number"], select { width: 100%; padding: 7px 9px; border-radius: 6px; border: 1px solid var(--line); background: var(--bg); color: var(--ink); font: inherit; font-variant-numeric: tabular-nums; }
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-bottom: 14px; }
+.stat { background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; }
+.stat .k { font-size: 0.74rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; font-weight: 600; }
+.stat .v { font-family: var(--font-display); font-size: 1.4rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+.stat .s { font-size: 0.78rem; color: var(--muted); }
+.note { font-size: 0.88rem; color: var(--muted); }
+.insight { background: var(--surface-2); border-radius: 8px; padding: 10px 12px; font-size: 0.9rem; }
+.insight b { color: var(--ink); }
+
+/* Funnel */
+.funnel { display: grid; gap: 8px; }
+.fstep { display: grid; grid-template-columns: 150px minmax(0, 1fr); gap: 10px; align-items: center; }
+@media (max-width: 520px) { .fstep { grid-template-columns: 1fr; gap: 4px; } }
+.fname { font-size: 0.86rem; font-weight: 500; }
+.fbar-wrap { background: var(--surface-2); border-radius: 6px; height: 34px; position: relative; overflow: hidden; }
+.fbar { height: 100%; background: var(--accent); border-radius: 6px; transition: width .2s; }
+.fbar.drop { background: var(--spice); }
+.flabel { position: absolute; inset: 0 auto 0 10px; display: flex; align-items: center; font-size: 0.8rem; font-variant-numeric: tabular-nums; color: var(--ink); font-weight: 600; white-space: nowrap; }
+.fbar-wrap .flabel { mix-blend-mode: normal; }
+
+/* Heatmap */
+.tbl-wrap { overflow-x: auto; }
+table.heat { border-collapse: separate; border-spacing: 3px; font-variant-numeric: tabular-nums; font-size: 0.8rem; min-width: 560px; }
+table.heat th { font-weight: 600; color: var(--muted); padding: 4px 6px; text-align: center; }
+table.heat th.rowh { text-align: left; white-space: nowrap; }
+table.heat td { text-align: center; padding: 7px 4px; border-radius: 4px; min-width: 48px; color: var(--ink); }
+table.heat td.na { background: transparent; color: var(--muted); }
+svg text { fill: var(--muted); font-family: var(--font-body); font-size: 11px; }
+
+/* Waterfall */
+.wf { display: grid; gap: 6px; }
+.wrow { display: grid; grid-template-columns: 170px minmax(0, 1fr) 80px; gap: 8px; align-items: center; font-size: 0.85rem; }
+@media (max-width: 520px) { .wrow { grid-template-columns: 120px minmax(0, 1fr) 64px; font-size: 0.78rem; } }
+.wtrack { height: 18px; position: relative; background: var(--surface-2); border-radius: 4px; }
+.wbar { position: absolute; top: 0; bottom: 0; border-radius: 4px; }
+.wbar.pos { background: var(--accent); }
+.wbar.neg { background: var(--bad); opacity: .8; }
+.wbar.tot { background: var(--spice); }
+.wval { text-align: right; font-family: var(--font-mono); font-size: 0.8rem; font-variant-numeric: tabular-nums; }
+
+/* A/B */
+.ab-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+@media (max-width: 860px) { .ab-grid { grid-template-columns: 1fr; } }
+.two { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.verdict { padding: 12px 14px; border-radius: 8px; font-weight: 500; border: 1px solid var(--line); }
+.verdict.good { border-color: var(--good); color: var(--good); }
+.verdict.bad { border-color: var(--bad); color: var(--bad); }
+.verdict.warn { border-color: var(--warn); color: var(--warn); }
+.checks { display: grid; gap: 6px; font-size: 0.88rem; }
+.checks div { display: flex; gap: 8px; }
+.dot { width: 10px; height: 10px; border-radius: 50%; flex: none; margin-top: 6px; }
+.dot.good { background: var(--good); } .dot.bad { background: var(--bad); } .dot.warn { background: var(--warn); }
+
+/* Quiz */
+.quiz { display: grid; gap: 14px; }
+.qcard { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 16px; display: grid; gap: 10px; }
+.opts { display: grid; gap: 8px; }
+.opt { text-align: left; border: 1px solid var(--line); background: var(--bg); color: var(--ink); padding: 9px 12px; border-radius: 8px; font: inherit; cursor: pointer; }
+.opt:hover { border-color: var(--accent); }
+.opt.right { border-color: var(--good); color: var(--good); font-weight: 600; }
+.opt.wrong { border-color: var(--bad); color: var(--bad); }
+.explain { font-size: 0.9rem; color: var(--muted); }
+.score { font-family: var(--font-display); font-weight: 700; }
+footer { padding-block: 30px 50px; color: var(--muted); font-size: 0.85rem; border-top: 1px solid var(--line); }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+
+<nav class="nav" aria-label="Sections">
+  <div class="wrap">
+    <span class="brand">Metrics Lab</span>
+    <a href="#tree">Metric tree</a>
+    <a href="#atlas">Atlas</a>
+    <a href="#funnel">Funnel lab</a>
+    <a href="#retention">Retention lab</a>
+    <a href="#economics">Unit economics</a>
+    <a href="#abtest">A/B lab</a>
+    <a href="#quiz">Quiz</a>
+  </div>
+</nav>
+
+<main class="wrap">
+  <header class="hero">
+    <span class="eyebrow">Product analyst prep · food delivery, quick commerce, going-out</span>
+    <h1>Food Delivery Metrics Lab</h1>
+    <p class="lede">Every metric from the standard product-analytics table, plus the food-delivery and quick-commerce metrics an analyst at a company like Eternal works with daily. Open any card for the formula, a worked example in rupees, the trap interviewers look for, and a practice question. Then move the sliders in the four labs to see how the numbers behave.</p>
+    <div class="legend">
+      <span class="pill base">Standard metric</span>
+      <span class="pill z">Food-delivery add-on</span>
+      <span>All numbers in examples and labs are illustrative, not company data.</span>
+    </div>
+  </header>
+
+  <!-- Metric tree -->
+  <section class="block" id="tree">
+    <div class="sec-head">
+      <span class="eyebrow">How the metrics connect</span>
+      <h2>The food delivery metric tree</h2>
+      <p>Interviewers want to see that you can break a top-line number into its drivers. Read left to right: each column explains the one before it. When a top-line metric moves, walk down this tree to find which input moved.</p>
+    </div>
+    <div class="tree">
+      <div class="tree-grid">
+        <div class="tcol">
+          <span class="eyebrow">North Star</span>
+          <div class="tnode top"><b>Net Order Value (NOV)</b><span>What customers actually pay, after discounts</span></div>
+          <div class="tnode top"><b>Contribution margin</b><span>What's left per order after variable costs</span></div>
+        </div>
+        <div class="tcol">
+          <span class="eyebrow">Drivers</span>
+          <div class="tnode"><b>Monthly transacting users</b><span>Who ordered at least once this month</span></div>
+          <div class="tnode"><b>Orders per user</b><span>Frequency: habit strength</span></div>
+          <div class="tnode"><b>Average order value</b><span>Basket size × price, minus discounts</span></div>
+        </div>
+        <div class="tcol">
+          <span class="eyebrow">Inputs</span>
+          <div class="tnode"><b>New + retained − churned</b><span>Activation, D7 retention, reactivation</span></div>
+          <div class="tnode"><b>Funnel conversion</b><span>Open → menu → cart → pay → delivered</span></div>
+          <div class="tnode"><b>Selection and price</b><span>Restaurant availability, search null rate, offers</span></div>
+        </div>
+        <div class="tcol">
+          <span class="eyebrow">Experience and ops</span>
+          <div class="tnode"><b>Delivery time and ETA accuracy</b><span>Median, P90, % on time</span></div>
+          <div class="tnode"><b>Order accuracy and cancellations</b><span>Wrong items, refunds, support contacts</span></div>
+          <div class="tnode"><b>Rider supply</b><span>Orders per rider-hour, wait at restaurant</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Atlas -->
+  <section class="block" id="atlas">
+    <div class="sec-head">
+      <span class="eyebrow">Reference</span>
+      <h2>Metric atlas</h2>
+      <p>Filter by category or search a term. Cards with a turmeric edge are food-delivery add-ons that go beyond the generic table.</p>
+    </div>
+    <div class="filters" id="chips" role="group" aria-label="Filter by category"></div>
+    <div class="search-row">
+      <input type="search" id="q" placeholder="Search metrics, e.g. retention, NOV, P90" aria-label="Search metrics">
+      <label class="toggle"><input type="checkbox" id="zonly"> Food-delivery add-ons only</label>
+      <span class="count" id="count"></span>
+    </div>
+    <div class="atlas" id="atlasGrid"></div>
+  </section>
+
+  <!-- Funnel lab -->
+  <section class="block" id="funnel">
+    <div class="sec-head">
+      <span class="eyebrow">Lab 1 · Funnels & activation</span>
+      <h2>Order funnel simulator</h2>
+      <p>Change each step's conversion. The biggest absolute loss of sessions is highlighted, which is where an analyst would look first. Notice how a small change late in the funnel (payment success) moves orders almost as much as a big change early on.</p>
+    </div>
+    <div class="lab">
+      <div class="panel controls" id="funnelCtl"></div>
+      <div class="panel">
+        <div class="stats" id="funnelStats"></div>
+        <div class="funnel" id="funnelBars"></div>
+        <p class="insight" id="funnelInsight" style="margin-top:14px"></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Retention lab -->
+  <section class="block" id="retention">
+    <div class="sec-head">
+      <span class="eyebrow">Lab 2 · Retention & cohorts</span>
+      <h2>Cohort retention simulator</h2>
+      <p>Six weekly signup cohorts. Each row shows what share of that cohort ordered again in week N after signing up. Newer cohorts have fewer weeks of data, which is why the table is a triangle. A curve that flattens instead of falling to zero means users have formed a habit.</p>
+    </div>
+    <div class="lab">
+      <div class="panel controls" id="retCtl"></div>
+      <div class="panel">
+        <div class="stats" id="retStats"></div>
+        <div class="tbl-wrap"><table class="heat" id="heat"></table></div>
+        <div style="margin-top:14px; overflow-x:auto"><svg id="retCurve" viewBox="0 0 640 240" width="100%" role="img" aria-label="Retention curves by cohort"></svg></div>
+        <p class="insight" id="retInsight" style="margin-top:10px"></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Unit economics -->
+  <section class="block" id="economics">
+    <div class="sec-head">
+      <span class="eyebrow">Lab 3 · Monetization & business health</span>
+      <h2>Unit economics of one order</h2>
+      <p>See how GOV, NOV, take rate and contribution margin relate. The waterfall shows where each rupee of an order goes. The sensitivity box tells you which lever moves monthly margin most, which is the kind of answer a "which metric should we optimize?" question rewards.</p>
+    </div>
+    <div class="lab">
+      <div class="panel controls" id="ueCtl"></div>
+      <div class="panel">
+        <div class="stats" id="ueStats"></div>
+        <div class="wf" id="waterfall"></div>
+        <p class="insight" id="ueInsight" style="margin-top:14px"></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- A/B lab -->
+  <section class="block" id="abtest">
+    <div class="sec-head">
+      <span class="eyebrow">Lab 4 · Experimentation</span>
+      <h2>A/B test planner and analyzer</h2>
+      <p>Left: how many users you need before you start. Right: enter results and read the verdict, including the two checks interviewers love: sample ratio mismatch and a guardrail metric.</p>
+    </div>
+    <div class="ab-grid">
+      <div class="panel">
+        <h3 style="margin-bottom:12px">1. Plan the test</h3>
+        <div class="controls">
+          <div class="ctl"><label for="abBase">Baseline conversion <output id="abBaseO"></output></label><input type="range" id="abBase" min="1" max="50" step="0.5" value="10"></div>
+          <div class="ctl"><label for="abMde">Minimum detectable effect (relative) <output id="abMdeO"></output></label><input type="range" id="abMde" min="1" max="30" step="0.5" value="10"></div>
+          <div class="two">
+            <div class="ctl"><label for="abAlpha">Significance (α)</label><select id="abAlpha"><option value="0.05" selected>0.05</option><option value="0.01">0.01</option><option value="0.10">0.10</option></select></div>
+            <div class="ctl"><label for="abPower">Power</label><select id="abPower"><option value="0.8" selected>80%</option><option value="0.9">90%</option></select></div>
+          </div>
+          <div class="ctl"><label for="abTraffic">Eligible users per day (both arms)</label><input type="number" id="abTraffic" min="100" step="100" value="20000"></div>
+        </div>
+        <div class="stats" id="abPlan" style="margin-top:14px"></div>
+        <p class="note" id="abPlanNote"></p>
+      </div>
+      <div class="panel">
+        <h3 style="margin-bottom:12px">2. Analyze the results</h3>
+        <div class="controls">
+          <div class="two">
+            <div class="ctl"><label for="aN">Control users</label><input type="number" id="aN" min="1" value="15000"></div>
+            <div class="ctl"><label for="bN">Treatment users</label><input type="number" id="bN" min="1" value="15100"></div>
+            <div class="ctl"><label for="aC">Control orders</label><input type="number" id="aC" min="0" value="1500"></div>
+            <div class="ctl"><label for="bC">Treatment orders</label><input type="number" id="bC" min="0" value="1662"></div>
+            <div class="ctl"><label for="aG">Control cancellations</label><input type="number" id="aG" min="0" value="60"></div>
+            <div class="ctl"><label for="bG">Treatment cancellations</label><input type="number" id="bG" min="0" value="70"></div>
+          </div>
+        </div>
+        <div class="stats" id="abRes" style="margin-top:14px"></div>
+        <div class="checks" id="abChecks"></div>
+        <div class="verdict" id="abVerdict" style="margin-top:12px"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Quiz -->
+  <section class="block" id="quiz">
+    <div class="sec-head">
+      <span class="eyebrow">Self-test</span>
+      <h2>Pick the right metric</h2>
+      <p>Interview-style scenarios. Choose an answer to see why it's right or wrong. Score: <span class="score" id="score">0 / 0</span></p>
+    </div>
+    <div class="quiz" id="quizList"></div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">Built for Product Analyst interview prep. Formulas are standard definitions; every rupee figure is an illustrative example, not company data. For real figures, read the company's latest shareholder letter.</div>
+</footer>
+
+<script>
+(function () {
+"use strict";
+var CATS = [
+  ["eng", "Engagement & Usage"], ["ret", "Retention & Churn"], ["coh", "Cohort Analysis"],
+  ["fun", "Funnels & Activation"], ["feat", "Feature Impact"], ["exp", "Experimentation"],
+  ["grow", "Growth & Acquisition"], ["mon", "Monetization"], ["qual", "Quality & Reliability"],
+  ["biz", "Business Health"], ["ops", "Delivery & Ops"], ["qc", "Quick Commerce"], ["out", "Going-out"]
+];
+var CAT_NAME = {}; CATS.forEach(function (c) { CAT_NAME[c[0]] = c[1]; });
+
+// n name, c category, t what it tells, f formula, ex worked example, trap, q interview question, z food-delivery add-on
+var M = [
+ {c:"eng", n:"DAU/MAU", t:"How frequently users return; a proxy for stickiness.", f:"average daily active users ÷ monthly active users", ex:"30 lakh DAU ÷ 1.5 crore MAU = 20%. The average monthly user opens the app on about 6 days a month.", trap:"Define 'active'. App opens include browsing; for a food app, a transacting definition (ordered today) gives a very different, lower number.", q:"Is 20% DAU/MAU good for a food delivery app? Compared with what?"},
+ {c:"eng", n:"Sessions per user", t:"Depth of engagement among active users.", f:"sessions in period ÷ active users in period", ex:"2.7 crore sessions ÷ 30 lakh users = 9 sessions per user per month.", trap:"More sessions is not always good. Users struggling to find a restaurant also generate extra sessions. Pair with session-to-order conversion.", q:"Sessions per user went up 15% but orders stayed flat. Good or bad?"},
+ {c:"eng", n:"Events per user", t:"How much users actually do, not just whether they show up.", f:"tracked events (search, menu view, add to cart) ÷ active users", ex:"18 menu views and 6 searches per active user per month.", trap:"Depends on tracking. An app release that adds or renames events creates a fake jump. Check the release log first.", q:"Events per user jumped 40% overnight. What's your first check?"},
+ {c:"eng", z:1, n:"Orders per transacting user (frequency)", t:"Habit strength. The main compounding growth lever in food delivery.", f:"delivered orders in month ÷ monthly transacting users", ex:"9 crore orders ÷ 2.25 crore MTU = 4.0 orders per user per month.", trap:"Mix shift: a wave of new users (who order less) lowers the average even if every cohort is ordering more. Segment by cohort.", q:"Which one metric should a food delivery app optimize? Defend it."},
+ {c:"eng", z:1, n:"Monthly transacting users (MTU)", t:"How many people actually paid for an order this month.", f:"count of unique users with ≥1 delivered order in month", ex:"2.25 crore unique users placed at least one delivered order in October.", trap:"Not the same as MAU (anyone who opened the app). Mixing them up in an interview is a red flag.", q:"MAU is up but MTU is down. What happened?"},
+
+ {c:"ret", n:"Day 7 retention", t:"Early product value and onboarding quality.", f:"users from a cohort who ordered again in days 1–7 ÷ cohort size", ex:"10,000 new users signed up in week 40; 2,800 ordered again within 7 days → 28% D7.", trap:"Say which definition: active exactly on day 7, or any time in days 1–7. They differ a lot for an app people use a few times a month.", q:"Write the SQL for D7 retention by signup week."},
+ {c:"ret", n:"Churn rate", t:"How quickly users stop engaging.", f:"users active last period but not this period ÷ users active last period", ex:"1 lakh users ordered in September; 30,000 of them didn't order in October → 30% monthly churn.", trap:"For infrequent users, one quiet month isn't churn. Define churn by an inactivity window (for example, no order in 60 days) or relative to the user's own ordering gap.", q:"How would you define churn for a user who orders once a month?"},
+ {c:"ret", n:"Rolling retention", t:"Whether users ever return after a given day.", f:"users active on day N or any later day ÷ cohort size", ex:"Classic D30 = 18% (ordered on day 30); rolling D30 = 35% (ordered on day 30 or later).", trap:"Rolling retention for recent cohorts keeps rising as time passes. Only compare cohorts of the same age.", q:"Why is rolling retention always ≥ classic retention?"},
+ {c:"ret", z:1, n:"Repeat order rate (30-day)", t:"Whether a first order turns into a second. The key early habit signal.", f:"first-time customers with a 2nd order within 30 days ÷ first-time customers", ex:"40,000 first orders in March; 17,200 ordered again within 30 days → 43%.", trap:"A first-order discount can raise first orders but bring in low-intent users with poor repeat rates. Track repeat rate by acquisition offer.", q:"A new-user offer doubled first orders. How do you know if it worked?"},
+ {c:"ret", z:1, n:"Reactivation rate", t:"How many lapsed users come back, e.g. after a win-back offer.", f:"lapsed users who ordered after the campaign ÷ lapsed users targeted (minus the same rate in a holdout)", ex:"Targeted group 9% came back; untouched holdout 6% → incremental reactivation 3 points.", trap:"Without a holdout you'll credit the campaign for users who would have returned anyway.", q:"Design a measurement for a win-back push notification."},
+
+ {c:"coh", n:"Cohort retention curve", t:"Behavior differences across signup periods.", f:"for each signup cohort: % active in week 0, 1, 2 … N", ex:"See the Retention lab below. Newer cohorts flatten at a higher level when onboarding improves.", trap:"Comparing a 2-week-old cohort's average with an 8-week-old cohort's average. Compare at the same age (week 4 vs week 4).", q:"How would you show that a new onboarding flow improved retention?"},
+ {c:"coh", n:"Revenue per cohort", t:"Long-term value of different user groups.", f:"Σ over weeks (active users × orders per active user × AOV)", ex:"A 10,000-user cohort generates ₹38 lakh NOV in its first 8 weeks.", trap:"Use contribution, not NOV, if discounts differ by cohort. A cohort bought with heavy discounts can have high NOV but negative margin.", q:"Which acquisition month produced our most valuable users?"},
+ {c:"coh", n:"Time to churn by cohort", t:"How quickly cohorts decay.", f:"median days from first order to last order, per cohort (for users considered churned)", ex:"Cohort Jan: median 41 days; cohort Jun: median 58 days.", trap:"Recent cohorts haven't had time to churn, so their numbers look better than they are (right-censoring).", q:"Why can't you compare time-to-churn for last month's cohort with last year's?"},
+
+ {c:"fun", n:"Activation rate", t:"Percent of users who reach the 'aha' moment.", f:"new users who complete the aha action within X days ÷ new users", ex:"For food delivery the aha is a first delivered order: 62,000 of 1.4 lakh installs ordered within 7 days → 44%.", trap:"Pick an aha action that predicts retention. Show that users who hit it retain much better than those who don't.", q:"What's the activation event for Blinkit, and how would you validate it?"},
+ {c:"fun", n:"Step-to-step conversion", t:"Where users drop inside a funnel.", f:"users reaching step k+1 ÷ users reaching step k", ex:"Cart → checkout 70%, checkout → payment success 92%. See the Funnel lab.", trap:"Count per user or per session, and say which. A user who abandons and returns 10 minutes later looks like a drop per session.", q:"Checkout conversion fell 5 points on Android only. Walk me through your analysis."},
+ {c:"fun", n:"Time to activate", t:"How quickly users reach first value.", f:"median time from install or signup to first delivered order", ex:"Median 26 hours from install to first order; P75 4 days.", trap:"Use the median, not the mean. A few users who order after 3 months distort the mean.", q:"Why median and not mean here?"},
+ {c:"fun", z:1, n:"Payment success rate", t:"Whether users who want to pay can pay.", f:"successful payments ÷ payment attempts", ex:"9.2 lakh attempts, 8.5 lakh successful → 92.4%.", trap:"Segment by method (UPI app, card, wallet, COD) and bank. A single bank or UPI app outage often explains a sudden dip.", q:"Payment success dropped 3 points at 9 pm. What do you check first?"},
+ {c:"fun", z:1, n:"Search null-result rate", t:"Demand you can't serve: a supply signal.", f:"searches with zero results or no serviceable restaurant ÷ total searches", ex:"4.5% of searches in a new locality return nothing; 'biryani' is the top unserved term.", trap:"High null rate can be a search quality problem (typos, synonyms) or a real supply gap. Check both before asking the sales team to onboard restaurants.", q:"How would you use search data to decide which restaurants to onboard next?"},
+
+ {c:"feat", n:"Feature adoption rate", t:"How many eligible users actually use a feature.", f:"users who used the feature ÷ users who were eligible to see it", ex:"Group ordering: 48,000 of 12 lakh eligible users → 4%.", trap:"The denominator is eligible users, not all users. A feature only on iOS can't be adopted by Android users.", q:"Adoption of a new feature is 4%. Is that a failure?"},
+ {c:"feat", n:"Retention lift", t:"Whether the feature improves return behavior.", f:"retention of treatment (or adopters) − retention of control", ex:"30-day repeat rate 46% in treatment vs 43% in control → +3 points.", trap:"Comparing adopters with non-adopters is biased: heavy users adopt everything. Use an A/B test or a matched comparison.", q:"Users who use 'Reorder' retain 2× better. Should we push Reorder to everyone?"},
+ {c:"feat", n:"Usage frequency post-adoption", t:"Whether adoption turns into habit.", f:"uses per adopter per week, from week 2 onward", ex:"Adopters used 'Schedule order' 1.8× in week 1, then 0.3× per week after.", trap:"Week 1 is inflated by curiosity (novelty effect). Judge on weeks 2+.", q:"How long would you wait before calling a feature a success?"},
+
+ {c:"exp", n:"Conversion rate uplift", t:"Direct effect of a variant on the target metric.", f:"(treatment rate − control rate) ÷ control rate", ex:"Control 10.0%, treatment 11.0% → +10% relative, +1 point absolute. See the A/B lab.", trap:"Always say absolute vs relative. '+10%' and '+1 point' describe the same result.", q:"Is a 0.3% lift worth shipping?"},
+ {c:"exp", n:"Guardrail metric change", t:"Whether the experiment caused harm elsewhere.", f:"same comparison as the primary metric, on metrics that must not get worse", ex:"Orders +4%, but cancellations +18% and delivery time +2 min → don't ship as is.", trap:"Pick guardrails before the test starts, otherwise you'll find a reason to ship anything.", q:"Name three guardrails for a test that makes the 'Order now' button bigger."},
+ {c:"exp", n:"Sample size / power", t:"Whether results are statistically reliable.", f:"n per arm ≈ (z₁₋α/2·√(2p̄(1−p̄)) + z₁₋β·√(p₁(1−p₁)+p₂(1−p₂)))² ÷ (p₂−p₁)²", ex:"10% → 11% at α = 0.05, power 80% needs about 14,750 users per arm.", trap:"Don't stop the test when it first looks significant (peeking). Decide the sample size up front.", q:"Baseline 4%, we want to detect +0.5 points. Roughly how many users?"},
+ {c:"exp", z:1, n:"Sample ratio mismatch (SRM)", t:"Whether randomization actually worked.", f:"chi-square test of observed users per arm vs the intended split", ex:"Intended 50/50, observed 50,600 vs 49,400 → p ≈ 0.0002. Something is broken.", trap:"With SRM, don't trust any result. Common causes: a bug that crashes one variant, bot filtering, or a redirect that loses users.", q:"Treatment has 52% of users in a 50/50 test. What do you do?"},
+ {c:"exp", z:1, n:"Incrementality (holdout)", t:"The true extra effect of an offer or campaign.", f:"metric in targeted group − metric in randomly held-out group", ex:"Coupon group ordered 1.9×/month vs holdout 1.7× → 0.2 incremental orders per user.", trap:"Offer redemption is not impact. Many redeemers would have ordered anyway.", q:"Marketing says the coupon drove 50,000 orders. How do you check?"},
+
+ {c:"grow", n:"Activation by channel", t:"Quality of incoming users.", f:"activation rate split by acquisition channel", ex:"Referral installs activate at 58%; paid social at 29%.", trap:"Cheap installs can be expensive users. Always pair CPA with activation and retention by channel.", q:"Channel A is half the cost per install of channel B. Shift budget?"},
+ {c:"grow", n:"Cost per acquisition (CPA)", t:"Efficiency of growth spend.", f:"channel spend ÷ new transacting users from that channel", ex:"₹45 lakh spend ÷ 30,000 first orders → ₹150 per acquired customer.", trap:"Define acquisition as first order, not install. Installs that never order cost money and add nothing.", q:"How would you compare CPA across channels fairly?"},
+ {c:"grow", n:"Channel-level retention", t:"Long-term value by acquisition source.", f:"cohort retention curve split by channel", ex:"Month-3 retention: organic 34%, referral 31%, paid 17%.", trap:"Attribution windows and last-click attribution can mislabel channels. State your attribution rule.", q:"Which channel would you invest in, given CPA and retention?"},
+ {c:"grow", z:1, n:"CAC payback period", t:"How long until a customer pays back what it cost to acquire them.", f:"CAC ÷ (contribution margin per order × orders per month)", ex:"CAC ₹150, ₹16 margin per order, 4 orders/month → about 2.3 months.", trap:"Use retention-adjusted orders per month; most users don't keep ordering at the same rate.", q:"Is a 9-month payback acceptable?"},
+
+ {c:"mon", n:"ARPU", t:"Average revenue across all users.", f:"platform revenue ÷ active (transacting) users", ex:"₹180 crore revenue ÷ 2.25 crore MTU → ₹80 per user per month.", trap:"Use the same 'user' definition as the rest of the analysis. ARPU per MAU and per MTU are very different numbers.", q:"ARPU fell but revenue rose. How?"},
+ {c:"mon", n:"Conversion to paid", t:"Effectiveness of the monetization funnel (e.g., a membership).", f:"users who buy the membership ÷ users offered it", ex:"3.2 lakh of 80 lakh MTU shown the membership offer subscribed → 4%.", trap:"Members ordering more doesn't prove membership causes it; frequent users self-select. Use a holdout or matched comparison.", q:"How would you measure whether a membership program is worth it?"},
+ {c:"mon", n:"LTV (lifetime value)", t:"Total value generated per user.", f:"contribution margin per order × orders per month × expected lifetime in months (or Σ cohort margin)", ex:"₹16 × 4 × 18 months ≈ ₹1,150 per customer.", trap:"Build LTV on margin, not revenue or GOV, otherwise every acquisition looks profitable.", q:"Your LTV:CAC is 3. Is that good, and what are the weak assumptions?"},
+ {c:"mon", z:1, n:"Average order value (AOV)", t:"Basket size per order.", f:"order value ÷ number of orders (say whether before or after discounts)", ex:"₹40.5 crore NOV ÷ 9 lakh orders → ₹450.", trap:"AOV can fall for good reasons: a cheaper small-meal offering brings in many new small orders. Check if total NOV rose.", q:"AOV dropped 8% week over week with steady traffic. Diagnose it."},
+ {c:"mon", z:1, n:"GOV vs NOV", t:"Gross vs what customers actually paid.", f:"GOV = total order value incl. fees and taxes · NOV = GOV − discounts", ex:"GOV grew 18%, NOV grew 14%: the 4-point gap is growth bought with discounts.", trap:"Leading with GOV can hide discount-driven growth. That's why some food delivery companies report NOV as their headline.", q:"Why would a company switch its headline metric from GOV to NOV?"},
+ {c:"mon", z:1, n:"Take rate", t:"How much of each order the platform keeps.", f:"platform revenue from an order (commission + fees + ads) ÷ order value", ex:"₹90 commission + ₹30 customer fees + ₹15 ads on a ₹450 order → 30%.", trap:"Raising take rate (commission) can make restaurants raise menu prices or leave. Watch restaurant churn and menu price inflation.", q:"Should we raise the platform fee by ₹2? How would you decide?"},
+ {c:"mon", z:1, n:"Ad revenue and restaurant ROAS", t:"Monetization from restaurants promoting themselves.", f:"ad revenue ÷ NOV; restaurant ROAS = orders value from ads ÷ ad spend", ex:"Ads at 3.3% of NOV; a restaurant spending ₹10,000 gets ₹45,000 of attributed orders → 4.5× ROAS.", trap:"Attributed ROAS overstates value if those customers would have ordered anyway. Incremental ROAS needs a holdout.", q:"How do you show a restaurant its ads are working?"},
+ {c:"mon", z:1, n:"Contribution margin per order", t:"Profit from one order after variable costs.", f:"commission + fees + ads − discounts − delivery cost − payment gateway − other variable costs", ex:"₹90 + ₹30 + ₹15 − ₹35 − ₹70 − ₹8 − ₹6 = ₹16 per order. See the Unit economics lab.", trap:"Fixed costs (salaries, tech) are excluded. That's EBITDA's job.", q:"Delivery cost rose ₹5 per order. What's the monthly impact?"},
+
+ {c:"qual", n:"Error rate", t:"Stability impact on user experience.", f:"failed requests (e.g., checkout API errors) ÷ total requests", ex:"Checkout API errors rose from 0.2% to 1.4% after a release.", trap:"A small error rate on a critical step (payment) matters more than a large one on a minor screen.", q:"How would you connect an error-rate spike to lost orders?"},
+ {c:"qual", n:"Crash rate", t:"Product reliability at a glance.", f:"sessions with a crash ÷ total sessions (by app version and device)", ex:"Version 18.4 crashes in 1.1% of sessions on older Android phones; others 0.1%.", trap:"Always split by app version and OS. An overall average hides one bad release.", q:"Orders dropped only on Android. What do you look at?"},
+ {c:"qual", n:"Support tickets per 100 orders", t:"Hidden friction not visible in event data.", f:"support contacts ÷ orders × 100", ex:"2.8 tickets per 100 orders; 40% are 'where is my order?'", trap:"Normalize by orders, not users. Ticket category matters more than the total.", q:"Ticket volume rose 20%. Is the product getting worse?"},
+ {c:"qual", z:1, n:"Order accuracy rate", t:"Whether customers got what they ordered.", f:"orders without wrong/missing item complaints ÷ delivered orders", ex:"98.6% accurate; the worst 5% of restaurants account for 40% of complaints.", trap:"Complaints undercount problems; many users don't report. Also look at ratings and reorder rates.", q:"How would you find restaurants that need intervention?"},
+ {c:"qual", z:1, n:"Rating and complaint rate", t:"Customer satisfaction per order.", f:"average rating, % orders rated ≤2 stars, complaints ÷ orders", ex:"Average 4.2; 6% of orders rated 2 or below, mostly late deliveries.", trap:"Only some users rate, and unhappy users rate more often. Track rating rate too.", q:"Ratings fell in one city. RCA?"},
+
+ {c:"biz", n:"Net revenue growth", t:"Overall business momentum.", f:"(revenue this period − same period last year) ÷ same period last year", ex:"Revenue grew 78% year over year.", trap:"Revenue can jump from an accounting change (e.g., moving from marketplace to owning inventory) without more orders. Compare on order value too.", q:"Revenue grew 78% but orders grew 25%. How?"},
+ {c:"biz", n:"Contribution margin", t:"Profitability of product decisions.", f:"total contribution ÷ NOV (as %)", ex:"₹16 per order on a ₹450 order → 3.6% of NOV.", trap:"A feature that grows orders but lowers margin per order can still be net positive. Compute total contribution.", q:"A free-delivery test raised orders 6% and cut margin per order by ₹4. Ship?"},
+ {c:"biz", n:"Refund / cancellation rate", t:"Revenue quality and user satisfaction.", f:"cancelled (or refunded) orders ÷ placed orders, split by who cancelled", ex:"3.1% cancelled: 1.4% customer, 1.2% restaurant, 0.5% no rider.", trap:"Split by reason. Each one has a different owner (product, restaurant ops, fleet).", q:"Cancellations rose 20% in Lucknow this week. Walk me through it."},
+ {c:"biz", z:1, n:"Adjusted EBITDA % of NOV", t:"Segment-level profitability as companies report it.", f:"adjusted EBITDA ÷ NOV", ex:"Food delivery at about 5% of NOV; a newer segment at −2%.", trap:"Includes fixed costs, unlike contribution margin. Quote reported numbers only from the official shareholder letter.", q:"What's the difference between contribution margin and adjusted EBITDA?"},
+
+ {c:"ops", z:1, n:"Delivery time (median and P90)", t:"Speed, the core customer promise.", f:"time from order placed to delivered; report median and 90th percentile", ex:"Median 29 min, P90 47 min. P90 is what angry users experience.", trap:"The mean hides the tail. A city can have a fine average while 10% of orders take over 45 minutes.", q:"Average delivery time rose 4 minutes nationwide. Diagnose it."},
+ {c:"ops", z:1, n:"ETA accuracy", t:"Whether we keep our promise.", f:"orders delivered within the promised time window ÷ delivered orders", ex:"86% delivered within ±5 min of ETA; late orders have 3× the complaint rate.", trap:"Padding ETAs improves accuracy but hurts conversion (a longer ETA shown at checkout). It's a trade-off.", q:"Should we show more conservative ETAs?"},
+ {c:"ops", z:1, n:"Rider wait at restaurant", t:"First-mile delay: food not ready when the rider arrives.", f:"rider arrival at restaurant → order picked up", ex:"Median 6 min; the slowest 10% of restaurants average 15 min.", trap:"This is often a restaurant prep-time problem, not a rider problem. Fix with better prep-time predictions.", q:"Where would you look to cut delivery time without more riders?"},
+ {c:"ops", z:1, n:"Orders per rider-hour", t:"Fleet efficiency and rider earnings.", f:"delivered orders ÷ logged-in rider hours", ex:"1.9 orders per rider-hour at lunch peak, 0.8 at 4 pm.", trap:"Too high means riders are overloaded (late deliveries); too low means riders earn less and leave. Balance it.", q:"How many riders does Gurugram need at Friday 8 pm?"},
+ {c:"ops", z:1, n:"Restaurant availability rate", t:"Supply reliability: are restaurants open when they should be?", f:"hours restaurants accept orders ÷ hours they are scheduled to be open", ex:"91% overall; drops to 82% during rain because kitchens switch off.", trap:"A restaurant that's 'online' but rejects orders is worse than one that's offline. Track rejection rate too.", q:"Orders dropped in one zone. Could it be supply? How would you check?"},
+
+ {c:"qc", z:1, n:"Orders per store per day", t:"Dark store throughput, the core unit-economics driver.", f:"delivered orders ÷ active dark stores ÷ days", ex:"1,400 orders per store per day; break-even assumed at ~1,000 (illustrative).", trap:"New stores take months to ramp up. Compare stores of the same age.", q:"How would you decide where to open the next 300 stores?"},
+ {c:"qc", z:1, n:"% orders delivered in ≤ 10 min", t:"Whether the core quick-commerce promise holds.", f:"orders delivered within 10 minutes ÷ delivered orders", ex:"78% in ≤10 min; drops to 61% in stores at the edge of their delivery radius.", trap:"Shrinking the delivery radius raises this metric but cuts serviceable customers. Look at both.", q:"Which metric should a quick commerce company optimize?"},
+ {c:"qc", z:1, n:"In-stock rate", t:"Whether customers find what they search for.", f:"SKU-hours in stock ÷ SKU-hours listed (or searches finding an in-stock item ÷ searches)", ex:"96% overall, but milk is out of stock in 12% of morning hours.", trap:"An overall average hides the few high-demand items that matter most. Weight by demand.", q:"Search-to-cart conversion dropped. Could it be inventory?"},
+ {c:"qc", z:1, n:"Items per order (basket size)", t:"How much each quick-commerce order carries.", f:"items in delivered orders ÷ delivered orders", ex:"4.6 items per order; ₹650 average basket.", trap:"Raising the free-delivery threshold grows baskets but can cut order count.", q:"Should we lower the free-delivery threshold from ₹199 to ₹149?"},
+ {c:"qc", z:1, n:"Store contribution margin", t:"Is a dark store profitable on a variable basis?", f:"(product margin + fees + ads − last-mile cost − store variable cost) ÷ GOV", ex:"−2% in month 1, +4% by month 6 as orders per day ramp up.", trap:"A store's first months are expected to lose money. Judge on the ramp curve.", q:"How long would you wait before closing an underperforming store?"},
+
+ {c:"out", z:1, n:"Booking conversion", t:"How many browsers book a movie, event or table.", f:"bookings ÷ users who viewed a showtime or event page", ex:"18% of showtime viewers booked; seat-selection screen has the largest drop.", trap:"Availability drives conversion. Sold-out shows depress conversion through no fault of the product.", q:"Booking conversion fell on weekends. RCA?"},
+ {c:"out", z:1, n:"Seat or table fill rate", t:"How full the inventory we sell is.", f:"seats (tables) booked ÷ seats (tables) listed", ex:"Weekday matinee 22% filled vs Saturday evening 81%.", trap:"High fill rate on a few shows can coexist with many empty ones. Look at the distribution.", q:"How would you use pricing to raise weekday fill rate?"}
+];
+
+/* ---------- Atlas ---------- */
+var chipsEl = document.getElementById("chips");
+var gridEl = document.getElementById("atlasGrid");
+var qEl = document.getElementById("q");
+var zEl = document.getElementById("zonly");
+var countEl = document.getElementById("count");
+var activeCat = "all";
+
+function esc(s) { return String(s).replace(/[&<>"]/g, function (ch) { return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[ch]; }); }
+
+function makeChip(id, label) {
+  var b = document.createElement("button");
+  b.className = "chip"; b.type = "button"; b.textContent = label; b.dataset.id = id;
+  b.setAttribute("aria-pressed", id === activeCat ? "true" : "false");
+  b.addEventListener("click", function () {
+    activeCat = id;
+    Array.prototype.forEach.call(chipsEl.children, function (c) { c.setAttribute("aria-pressed", c.dataset.id === id ? "true" : "false"); });
+    renderAtlas();
+  });
+  chipsEl.appendChild(b);
+}
+makeChip("all", "All");
+CATS.forEach(function (c) { makeChip(c[0], c[1]); });
+
+function renderAtlas() {
+  var term = qEl.value.trim().toLowerCase();
+  var zOnly = zEl.checked;
+  var html = "", shown = 0;
+  CATS.forEach(function (c) {
+    if (activeCat !== "all" && activeCat !== c[0]) return;
+    var items = M.filter(function (m) {
+      if (m.c !== c[0]) return false;
+      if (zOnly && !m.z) return false;
+      if (!term) return true;
+      return (m.n + " " + m.t + " " + m.f + " " + m.ex + " " + m.trap + " " + m.q).toLowerCase().indexOf(term) !== -1;
+    });
+    if (!items.length) return;
+    html += '<div class="cat-group"><h3>' + esc(c[1]) + '</h3><span>' + items.length + ' metric' + (items.length > 1 ? 's' : '') + '</span></div>';
+    items.forEach(function (m) {
+      shown++;
+      html += '<details class="metric' + (m.z ? ' z' : '') + '"><summary>' +
+        '<div class="row"><span class="name">' + esc(m.n) + '</span><span class="chev" aria-hidden="true">▶</span></div>' +
+        '<span class="tells">' + esc(m.t) + '</span>' +
+        (m.z ? '<span><span class="pill z">Food-delivery add-on</span></span>' : '') +
+        '</summary><div class="mbody">' +
+        '<div><div class="lbl">Formula</div><div class="formula">' + esc(m.f) + '</div></div>' +
+        '<div><div class="lbl">Worked example</div><p>' + esc(m.ex) + '</p></div>' +
+        '<div><div class="lbl">Trap</div><p class="trap">' + esc(m.trap) + '</p></div>' +
+        '<div><div class="lbl">Practice question</div><p class="q">' + esc(m.q) + '</p></div>' +
+        '</div></details>';
+    });
+  });
+  if (!shown) html = '<p class="empty">No metrics match. Try a shorter search term or choose All.</p>';
+  gridEl.innerHTML = html;
+  countEl.textContent = shown + " of " + M.length + " metrics";
+}
+qEl.addEventListener("input", renderAtlas);
+zEl.addEventListener("change", renderAtlas);
+renderAtlas();
+
+/* ---------- Helpers ---------- */
+function fmtIN(n, d) { return Number(n).toLocaleString("en-IN", { maximumFractionDigits: d || 0, minimumFractionDigits: d || 0 }); }
+function inr(n) {
+  var a = Math.abs(n), s = n < 0 ? "−₹" : "₹";
+  if (a >= 1e7) return s + fmtIN(a / 1e7, 1) + " cr";
+  if (a >= 1e5) return s + fmtIN(a / 1e5, 1) + " lakh";
+  return s + fmtIN(a, a < 100 ? 1 : 0);
+}
+function big(n) {
+  if (n >= 1e7) return fmtIN(n / 1e7, 2) + " cr";
+  if (n >= 1e5) return fmtIN(n / 1e5, 1) + " lakh";
+  return fmtIN(n);
+}
+function pct(x, d) { return (x * 100).toFixed(d === undefined ? 1 : d) + "%"; }
+function stat(k, v, s) { return '<div class="stat"><div class="k">' + k + '</div><div class="v">' + v + '</div>' + (s ? '<div class="s">' + s + '</div>' : '') + '</div>'; }
+function slider(id, label, min, max, step, val, fmt) {
+  return { id: id, label: label, min: min, max: max, step: step, val: val, fmt: fmt };
+}
+function buildControls(container, defs, onChange) {
+  container.innerHTML = defs.map(function (d) {
+    return '<div class="ctl"><label for="' + d.id + '">' + d.label + ' <output id="' + d.id + 'O"></output></label>' +
+      '<input type="range" id="' + d.id + '" min="' + d.min + '" max="' + d.max + '" step="' + d.step + '" value="' + d.val + '"></div>';
+  }).join("");
+  defs.forEach(function (d) {
+    var el = document.getElementById(d.id), out = document.getElementById(d.id + "O");
+    var upd = function () { out.textContent = d.fmt(+el.value); };
+    el.addEventListener("input", function () { upd(); onChange(); });
+    upd();
+  });
+}
+function v(id) { return +document.getElementById(id).value; }
+
+/* ---------- Funnel lab ---------- */
+var FSTEPS = [
+  ["App opens (sessions)", null],
+  ["Restaurant / menu view", 55],
+  ["Add to cart", 45],
+  ["Proceed to checkout", 70],
+  ["Payment success", 92],
+  ["Delivered (not cancelled)", 97]
+];
+var fdefs = [slider("fStart", "Sessions per day", 20000, 500000, 10000, 100000, function (x) { return big(x); })];
+FSTEPS.slice(1).forEach(function (s, i) { fdefs.push(slider("fs" + (i + 1), s[0] + " rate", 10, 100, 1, s[1], function (x) { return x + "%"; })); });
+fdefs.push(slider("fAov", "Average order value", 150, 1200, 10, 450, function (x) { return "₹" + x; }));
+buildControls(document.getElementById("funnelCtl"), fdefs, renderFunnel);
+
+function renderFunnel() {
+  var counts = [v("fStart")];
+  for (var i = 1; i < FSTEPS.length; i++) counts.push(counts[i - 1] * v("fs" + i) / 100);
+  var maxDrop = 0, maxIdx = 1;
+  for (var j = 1; j < counts.length; j++) { var d = counts[j - 1] - counts[j]; if (d > maxDrop) { maxDrop = d; maxIdx = j; } }
+  var orders = counts[counts.length - 1], conv = orders / counts[0], aov = v("fAov");
+  document.getElementById("funnelStats").innerHTML =
+    stat("Delivered orders / day", big(Math.round(orders))) +
+    stat("Session → order", pct(conv)) +
+    stat("NOV / day", inr(orders * aov), "orders × AOV");
+  document.getElementById("funnelBars").innerHTML = counts.map(function (c, k) {
+    var w = Math.max(2, c / counts[0] * 100);
+    var lbl = big(Math.round(c)) + (k ? " · " + v("fs" + k) + "% of previous" : "");
+    return '<div class="fstep"><span class="fname">' + FSTEPS[k][0] + '</span><div class="fbar-wrap"><div class="fbar' + (k === maxIdx ? ' drop' : '') + '" style="width:' + w.toFixed(1) + '%"></div><span class="flabel">' + lbl + '</span></div></div>';
+  }).join("");
+  // what-if: +1 point at payment vs +1 point at menu view
+  var payIdx = 4, menuIdx = 1;
+  var gainPay = orders / (v("fs" + payIdx) / 100) * ((v("fs" + payIdx) + 1) / 100) - orders;
+  var gainMenu = orders / (v("fs" + menuIdx) / 100) * ((v("fs" + menuIdx) + 1) / 100) - orders;
+  document.getElementById("funnelInsight").innerHTML =
+    "<b>Biggest loss:</b> " + FSTEPS[maxIdx][0].toLowerCase() + " loses " + big(Math.round(maxDrop)) + " sessions a day. " +
+    "<b>What-if:</b> +1 point of payment success adds " + big(Math.round(gainPay)) + " orders/day; +1 point of menu views adds " + big(Math.round(gainMenu)) +
+    ". One point is worth more where the rate is lower, so cheap fixes at weak steps win.";
+}
+renderFunnel();
+
+/* ---------- Retention lab ---------- */
+buildControls(document.getElementById("retCtl"), [
+  slider("rW1", "Week-1 retention", 15, 80, 1, 45, function (x) { return x + "%"; }),
+  slider("rFloor", "Long-term floor (habit level)", 0, 40, 1, 18, function (x) { return x + "%"; }),
+  slider("rImp", "Improvement per newer cohort", 0, 4, 0.5, 1.5, function (x) { return "+" + x + " pts"; }),
+  slider("rSize", "Users per cohort", 1000, 50000, 1000, 10000, function (x) { return fmtIN(x); }),
+  slider("rFreq", "Orders per active user per week", 1, 3, 0.1, 1.3, function (x) { return x.toFixed(1); }),
+  slider("rAov", "Average order value", 150, 1000, 10, 420, function (x) { return "₹" + x; })
+], renderRet);
+
+var WEEKS = 8, COH = 6;
+function retCurve(w1, floor, w) {
+  if (w === 0) return 1;
+  var f = Math.min(floor, w1 - 0.01);
+  var k = -Math.log((w1 - f) / (1 - f));
+  return f + (1 - f) * Math.exp(-k * w);
+}
+function renderRet() {
+  var w1 = v("rW1") / 100, floor = v("rFloor") / 100, imp = v("rImp") / 100;
+  var size = v("rSize"), freq = v("rFreq"), aov = v("rAov");
+  var rows = [];
+  for (var c = 0; c < COH; c++) {
+    var cw1 = Math.min(0.95, w1 + imp * c), cf = Math.min(cw1 - 0.01, floor + imp * c);
+    var observed = WEEKS - c; // oldest cohort sees weeks 0..8
+    var vals = [];
+    for (var w = 0; w <= WEEKS; w++) vals.push({ r: retCurve(cw1, cf, w), obs: w <= observed });
+    rows.push(vals);
+  }
+  var head = "<tr><th class='rowh'>Signup cohort</th>";
+  for (var w2 = 0; w2 <= WEEKS; w2++) head += "<th>W" + w2 + "</th>";
+  head += "</tr>";
+  var body = rows.map(function (vals, c) {
+    return "<tr><th class='rowh'>Week " + (c + 1) + " signups</th>" + vals.map(function (x) {
+      if (!x.obs) return "<td class='na'>·</td>";
+      var a = Math.round(15 + x.r * 75);
+      return "<td style='background:color-mix(in srgb, var(--accent) " + a + "%, var(--surface))'>" + Math.round(x.r * 100) + "%</td>";
+    }).join("") + "</tr>";
+  }).join("");
+  document.getElementById("heat").innerHTML = "<thead>" + head + "</thead><tbody>" + body + "</tbody>";
+
+  // revenue for oldest cohort across 8 weeks (weeks 1..8)
+  var rev = 0; for (var w3 = 1; w3 <= WEEKS; w3++) rev += size * rows[0][w3].r * freq * aov;
+  var revNew = 0; for (var w4 = 1; w4 <= WEEKS; w4++) revNew += size * rows[COH - 1][w4].r * freq * aov;
+  document.getElementById("retStats").innerHTML =
+    stat("Week-4 retention, oldest", pct(rows[0][4].r, 0)) +
+    stat("Week-4 retention, newest observed", pct(rows[COH - 2][4].r, 0), "cohort 5 is the newest with week 4 data") +
+    stat("8-week NOV, oldest cohort", inr(rev), "users × retention × orders × AOV");
+
+  // SVG curves
+  var W = 640, H = 240, L = 44, R = 16, T = 14, B = 30;
+  var x = function (w) { return L + (W - L - R) * w / WEEKS; };
+  var y = function (r) { return T + (H - T - B) * (1 - r); };
+  var s = "";
+  [0, 0.25, 0.5, 0.75, 1].forEach(function (g) {
+    s += "<line x1='" + L + "' x2='" + (W - R) + "' y1='" + y(g) + "' y2='" + y(g) + "' stroke='var(--line)' stroke-width='1'/>";
+    s += "<text x='" + (L - 8) + "' y='" + (y(g) + 4) + "' text-anchor='end'>" + (g * 100) + "%</text>";
+  });
+  for (var wk = 0; wk <= WEEKS; wk++) s += "<text x='" + x(wk) + "' y='" + (H - 10) + "' text-anchor='middle'>W" + wk + "</text>";
+  rows.forEach(function (vals, c) {
+    var pts = vals.filter(function (p) { return p.obs; }).map(function (p, i) { return x(i).toFixed(1) + "," + y(p.r).toFixed(1); }).join(" ");
+    var op = (0.3 + 0.7 * c / (COH - 1)).toFixed(2);
+    s += "<polyline points='" + pts + "' fill='none' stroke='var(--accent)' stroke-opacity='" + op + "' stroke-width='" + (c === COH - 1 ? 3 : 1.8) + "'/>";
+  });
+  s += "<line x1='" + L + "' x2='" + (W - R) + "' y1='" + y(floor) + "' y2='" + y(floor) + "' stroke='var(--spice)' stroke-dasharray='5 4' stroke-width='1.5'/>";
+  s += "<text x='" + (W - R) + "' y='" + (y(floor) - 6) + "' text-anchor='end' style='fill:var(--spice)'>habit floor " + Math.round(floor * 100) + "%</text>";
+  document.getElementById("retCurve").innerHTML = s;
+
+  document.getElementById("retInsight").innerHTML = floor < 0.05
+    ? "<b>No floor:</b> the curves fall toward zero, so users never form a habit. Fixing acquisition won't help until the product retains people."
+    : "<b>Reading it:</b> darker lines are newer cohorts. If they sit higher at the same week, something improved (onboarding, offers, delivery speed). Compare cohorts at the <b>same age</b>, never the newest cohort's average with the oldest's.";
+}
+renderRet();
+
+/* ---------- Unit economics ---------- */
+buildControls(document.getElementById("ueCtl"), [
+  slider("uMtu", "Monthly transacting users", 2, 300, 1, 20, function (x) { return x + " lakh"; }),
+  slider("uFreq", "Orders per user per month", 1, 10, 0.1, 4, function (x) { return x.toFixed(1); }),
+  slider("uAov", "Food value per order", 150, 1200, 10, 450, function (x) { return "₹" + x; }),
+  slider("uComm", "Restaurant commission", 5, 35, 0.5, 20, function (x) { return x + "%"; }),
+  slider("uFee", "Customer fees per order (platform + delivery)", 0, 80, 1, 30, function (x) { return "₹" + x; }),
+  slider("uAds", "Ad income per order", 0, 50, 1, 15, function (x) { return "₹" + x; }),
+  slider("uDisc", "Platform-funded discount per order", 0, 120, 1, 35, function (x) { return "₹" + x; }),
+  slider("uDel", "Delivery cost per order (rider pay)", 30, 120, 1, 70, function (x) { return "₹" + x; }),
+  slider("uPg", "Payment gateway", 0, 3, 0.1, 1.8, function (x) { return x.toFixed(1) + "%"; }),
+  slider("uOther", "Support, refunds, other per order", 0, 30, 1, 6, function (x) { return "₹" + x; })
+], renderUE);
+
+function ueCalc(o) {
+  var comm = o.aov * o.comm / 100, pg = (o.aov + o.fee) * o.pg / 100;
+  var cm = comm + o.fee + o.ads - o.disc - o.del - pg - o.other;
+  var orders = o.mtu * 1e5 * o.freq;
+  return { comm: comm, pg: pg, cm: cm, orders: orders, gov: orders * (o.aov + o.fee), nov: orders * (o.aov + o.fee - o.disc), monthly: cm * orders };
+}
+function ueInputs() { return { mtu: v("uMtu"), freq: v("uFreq"), aov: v("uAov"), comm: v("uComm"), fee: v("uFee"), ads: v("uAds"), disc: v("uDisc"), del: v("uDel"), pg: v("uPg"), other: v("uOther") }; }
+function renderUE() {
+  var o = ueInputs(), r = ueCalc(o);
+  var takeRate = (r.comm + o.fee + o.ads) / (o.aov + o.fee);
+  document.getElementById("ueStats").innerHTML =
+    stat("Orders / month", big(Math.round(r.orders))) +
+    stat("GOV / month", inr(r.gov), "incl. customer fees") +
+    stat("NOV / month", inr(r.nov), "GOV − discounts") +
+    stat("Take rate", pct(takeRate), "(commission + fees + ads) ÷ GOV") +
+    stat("Contribution / order", inr(r.cm), pct(r.cm / (o.aov + o.fee - o.disc)) + " of NOV") +
+    stat("Contribution / month", inr(r.monthly));
+  var items = [
+    ["Commission", r.comm], ["Customer fees", o.fee], ["Ad income", o.ads],
+    ["Discount", -o.disc], ["Delivery cost", -o.del], ["Payment gateway", -r.pg], ["Support & other", -o.other]
+  ];
+  var maxAbs = Math.max.apply(null, items.map(function (i) { return Math.abs(i[1]); }).concat([Math.abs(r.cm), 1]));
+  var run = 0, html = "";
+  // scale on cumulative range
+  var cum = [0], c = 0; items.forEach(function (i) { c += i[1]; cum.push(c); });
+  var lo = Math.min.apply(null, cum.concat([0])), hi = Math.max.apply(null, cum.concat([0]));
+  var span = Math.max(hi - lo, 1);
+  var pos = function (val) { return (val - lo) / span * 100; };
+  items.forEach(function (i) {
+    var a = run, b = run + i[1]; run = b;
+    var left = pos(Math.min(a, b)), width = Math.max(0.8, Math.abs(pos(b) - pos(a)));
+    html += '<div class="wrow"><span>' + i[0] + '</span><div class="wtrack"><div class="wbar ' + (i[1] >= 0 ? 'pos' : 'neg') + '" style="left:' + left.toFixed(1) + '%;width:' + width.toFixed(1) + '%"></div></div><span class="wval">' + (i[1] >= 0 ? '+' : '') + inr(i[1]) + '</span></div>';
+  });
+  var l2 = pos(Math.min(0, r.cm)), w2 = Math.max(0.8, Math.abs(pos(r.cm) - pos(0)));
+  html += '<div class="wrow"><b>Contribution / order</b><div class="wtrack"><div class="wbar ' + (r.cm >= 0 ? 'tot' : 'neg') + '" style="left:' + l2.toFixed(1) + '%;width:' + w2.toFixed(1) + '%"></div></div><span class="wval"><b>' + inr(r.cm) + '</b></span></div>';
+  document.getElementById("waterfall").innerHTML = html;
+
+  // sensitivity: which 10% improvement moves monthly contribution most
+  var levers = [
+    ["10% more users", function (x) { x.mtu *= 1.1; }],
+    ["10% more frequency", function (x) { x.freq *= 1.1; }],
+    ["10% higher AOV", function (x) { x.aov *= 1.1; }],
+    ["10% lower delivery cost", function (x) { x.del *= 0.9; }],
+    ["10% lower discounts", function (x) { x.disc *= 0.9; }]
+  ].map(function (l) { var x = ueInputs(); l[1](x); return [l[0], ueCalc(x).monthly - r.monthly]; });
+  levers.sort(function (a, b) { return b[1] - a[1]; });
+  var top = levers[0];
+  document.getElementById("ueInsight").innerHTML = r.cm < 0
+    ? "<b>Every order loses money.</b> Growing users or frequency makes losses bigger. Fix per-order economics first (discounts, delivery cost, fees). Best single lever right now: " + top[0].toLowerCase() + " (" + (top[1] >= 0 ? "+" : "") + inr(top[1]) + "/month)."
+    : "<b>Sensitivity:</b> " + levers.map(function (l) { return l[0].toLowerCase() + " → " + (l[1] >= 0 ? "+" : "") + inr(l[1]); }).join("; ") + ". The biggest lever here is <b>" + top[0].toLowerCase() + "</b>. When margin per order is thin, cost levers often beat growth levers.";
+}
+renderUE();
+
+/* ---------- Stats helpers ---------- */
+function erf(x) {
+  var s = x < 0 ? -1 : 1; x = Math.abs(x);
+  var t = 1 / (1 + 0.3275911 * x);
+  var y = 1 - (((((1.061405429 * t - 1.453152027) * t) + 1.421413741) * t - 0.284496736) * t + 0.254829592) * t * Math.exp(-x * x);
+  return s * y;
+}
+function normCdf(z) { return 0.5 * (1 + erf(z / Math.SQRT2)); }
+function invNorm(p) {
+  // Acklam's approximation
+  var a = [-3.969683028665376e+01, 2.209460984245205e+02, -2.759285104469687e+02, 1.383577518672690e+02, -3.066479806614716e+01, 2.506628277459239e+00];
+  var b = [-5.447609879822406e+01, 1.615858368580409e+02, -1.556989798598866e+02, 6.680131188771972e+01, -1.328068155288572e+01];
+  var c = [-7.784894002430293e-03, -3.223964580411365e-01, -2.400758277161838e+00, -2.549732539343734e+00, 4.374664141464968e+00, 2.938163982698783e+00];
+  var d = [7.784695709041462e-03, 3.224671290700398e-01, 2.445134137142996e+00, 3.754408661907416e+00];
+  var pl = 0.02425, q, r;
+  if (p < pl) { q = Math.sqrt(-2 * Math.log(p)); return (((((c[0]*q+c[1])*q+c[2])*q+c[3])*q+c[4])*q+c[5]) / ((((d[0]*q+d[1])*q+d[2])*q+d[3])*q+1); }
+  if (p > 1 - pl) { q = Math.sqrt(-2 * Math.log(1 - p)); return -(((((c[0]*q+c[1])*q+c[2])*q+c[3])*q+c[4])*q+c[5]) / ((((d[0]*q+d[1])*q+d[2])*q+d[3])*q+1); }
+  q = p - 0.5; r = q * q;
+  return (((((a[0]*r+a[1])*r+a[2])*r+a[3])*r+a[4])*r+a[5])*q / (((((b[0]*r+b[1])*r+b[2])*r+b[3])*r+b[4])*r+1);
+}
+
+/* ---------- A/B lab ---------- */
+function renderPlan() {
+  var p1 = v("abBase") / 100, mde = v("abMde") / 100, alpha = +document.getElementById("abAlpha").value, power = +document.getElementById("abPower").value;
+  document.getElementById("abBaseO").textContent = (p1 * 100).toFixed(1) + "%";
+  document.getElementById("abMdeO").textContent = "+" + (mde * 100).toFixed(1) + "% → " + (p1 * (1 + mde) * 100).toFixed(2) + "%";
+  var p2 = Math.min(0.999, p1 * (1 + mde)), pbar = (p1 + p2) / 2;
+  var za = invNorm(1 - alpha / 2), zb = invNorm(power);
+  var n = Math.pow(za * Math.sqrt(2 * pbar * (1 - pbar)) + zb * Math.sqrt(p1 * (1 - p1) + p2 * (1 - p2)), 2) / Math.pow(p2 - p1, 2);
+  n = Math.ceil(n);
+  var traffic = Math.max(1, v("abTraffic")), days = Math.ceil(2 * n / traffic);
+  document.getElementById("abPlan").innerHTML = stat("Users per arm", fmtIN(n)) + stat("Total users", fmtIN(2 * n)) + stat("Days needed", fmtIN(days), days < 7 ? "run at least 7 days anyway" : "covers " + Math.floor(days / 7) + " full week(s)");
+  document.getElementById("abPlanNote").textContent = "Halving the detectable effect roughly quadruples the sample size. Run for full weeks so weekday and weekend ordering patterns are both included, even if you hit the sample size sooner.";
+}
+["abBase", "abMde", "abAlpha", "abPower", "abTraffic"].forEach(function (id) { document.getElementById(id).addEventListener("input", renderPlan); });
+renderPlan();
+
+function renderAB() {
+  var aN = Math.max(1, v("aN")), bN = Math.max(1, v("bN")), aC = Math.min(v("aC"), aN), bC = Math.min(v("bC"), bN);
+  var aG = v("aG"), bG = v("bG");
+  var pa = aC / aN, pb = bC / bN, pp = (aC + bC) / (aN + bN);
+  var se0 = Math.sqrt(pp * (1 - pp) * (1 / aN + 1 / bN));
+  var z = se0 > 0 ? (pb - pa) / se0 : 0, p = 2 * (1 - normCdf(Math.abs(z)));
+  var se = Math.sqrt(pa * (1 - pa) / aN + pb * (1 - pb) / bN);
+  var lo = (pb - pa) - 1.96 * se, hi = (pb - pa) + 1.96 * se;
+  // SRM vs 50/50
+  var exp = (aN + bN) / 2, chi = Math.pow(aN - exp, 2) / exp + Math.pow(bN - exp, 2) / exp;
+  var pSrm = 2 * (1 - normCdf(Math.sqrt(chi)));
+  // guardrail: cancellation rate per order
+  var ga = aC ? aG / aC : 0, gb = bC ? bG / bC : 0;
+  var gp = (aG + bG) / Math.max(1, aC + bC);
+  var gse = Math.sqrt(gp * (1 - gp) * (1 / Math.max(1, aC) + 1 / Math.max(1, bC)));
+  var gz = gse > 0 ? (gb - ga) / gse : 0, gP = 2 * (1 - normCdf(Math.abs(gz)));
+  document.getElementById("abRes").innerHTML =
+    stat("Control", pct(pa, 2), fmtIN(aC) + " / " + fmtIN(aN)) +
+    stat("Treatment", pct(pb, 2), fmtIN(bC) + " / " + fmtIN(bN)) +
+    stat("Lift", ((pb - pa) * 100 >= 0 ? "+" : "") + ((pb - pa) * 100).toFixed(2) + " pts", (pa ? ((pb / pa - 1) * 100).toFixed(1) : "0") + "% relative") +
+    stat("p-value", p < 0.0001 ? "< 0.0001" : p.toFixed(4), "95% CI: " + (lo * 100).toFixed(2) + " to " + (hi * 100).toFixed(2) + " pts");
+  var srmBad = pSrm < 0.001, guardBad = gb > ga && gP < 0.05;
+  var checks = "";
+  checks += '<div><span class="dot ' + (srmBad ? 'bad' : 'good') + '"></span><span><b>Sample ratio:</b> ' + fmtIN(aN) + ' vs ' + fmtIN(bN) + ' (p = ' + (pSrm < 0.0001 ? '< 0.0001' : pSrm.toFixed(3)) + '). ' + (srmBad ? 'Mismatch: randomization is broken, don’t trust the result.' : 'Consistent with a 50/50 split.') + '</span></div>';
+  checks += '<div><span class="dot ' + (guardBad ? 'bad' : (gb > ga ? 'warn' : 'good')) + '"></span><span><b>Guardrail (cancellation rate):</b> ' + pct(ga, 2) + ' → ' + pct(gb, 2) + ' (p = ' + gP.toFixed(3) + '). ' + (guardBad ? 'Significantly worse.' : (gb > ga ? 'Slightly worse but not significant; keep watching.' : 'No harm detected.')) + '</span></div>';
+  document.getElementById("abChecks").innerHTML = checks;
+  var vEl = document.getElementById("abVerdict"), cls, msg;
+  if (srmBad) { cls = "bad"; msg = "Stop. Fix the sample ratio mismatch before reading any metric."; }
+  else if (p < 0.05 && pb > pa && !guardBad) { cls = "good"; msg = "Ship candidate: significant lift with no guardrail harm. Check the lift is stable over time (novelty effect) and big enough to matter."; }
+  else if (p < 0.05 && pb > pa && guardBad) { cls = "warn"; msg = "Trade-off: conversion is up but cancellations are significantly up. Quantify net impact (orders gained vs cancellations and refunds) before deciding."; }
+  else if (p < 0.05 && pb < pa) { cls = "bad"; msg = "Treatment is significantly worse. Don't ship; find out why."; }
+  else { cls = "warn"; msg = "Not significant. Don't call it a loss either: check whether the test had enough users for the effect you care about (left panel)."; }
+  vEl.className = "verdict " + cls; vEl.textContent = msg;
+}
+["aN", "bN", "aC", "bC", "aG", "bG"].forEach(function (id) { document.getElementById(id).addEventListener("input", renderAB); });
+renderAB();
+
+/* ---------- Quiz ---------- */
+var QUIZ = [
+  { q: "You want to know whether new users get value fast enough. Which metric?", o: ["DAU/MAU", "Activation rate (first order within 7 days) and D7 repeat rate", "Total orders", "ARPU"], a: 1, e: "Early value shows up in activation and early repeat behavior. DAU/MAU and total orders mix in your oldest, most loyal users." },
+  { q: "Order value is growing fast, but a lot of it comes from discounts. Which headline metric exposes this?", o: ["GOV", "NOV", "Sessions per user", "Crash rate"], a: 1, e: "NOV = GOV − discounts. If GOV grows faster than NOV, growth is being bought with discounts." },
+  { q: "A test lifts conversion 4%, but complaints and cancellations rise. What concept is this?", o: ["Novelty effect", "Guardrail metric breach", "Simpson's paradox", "Sample ratio mismatch"], a: 1, e: "Cancellations and complaints are guardrails: metrics that must not get worse. Quantify the trade-off before shipping." },
+  { q: "Your 50/50 test shows 52,000 users in treatment and 48,000 in control. First step?", o: ["Ship if the lift is significant", "Run it longer", "Investigate sample ratio mismatch; don't trust results yet", "Use a one-sided test"], a: 2, e: "That split is extremely unlikely by chance. Something in assignment or logging is broken, so every metric is suspect." },
+  { q: "Average delivery time looks fine, yet complaints about late food are rising. What should you look at?", o: ["Mean delivery time by month", "P90 delivery time and ETA accuracy", "DAU/MAU", "Take rate"], a: 1, e: "Complaints come from the slow tail. P90 and the share of orders later than the promised ETA show the tail; the mean hides it." },
+  { q: "Channel A brings installs at half the cost of channel B. Before moving budget, check:", o: ["Nothing; cheaper is better", "Activation and retention by channel, then CAC payback", "Crash rate by channel", "Sessions per user"], a: 1, e: "Cheap installs that never order or churn quickly can cost more per retained customer. Compare cost per retained, profitable customer." },
+  { q: "Members of a paid membership order 2× more than non-members. Is the program working?", o: ["Yes, clearly", "Not proven: heavy users self-select; compare against a holdout or matched users", "No, memberships never work", "Only if ARPU is higher"], a: 1, e: "Selection bias. Measure incremental orders against comparable users who weren't offered the membership." },
+  { q: "For a quick commerce dark store, which single metric best tracks unit economics?", o: ["Orders per store per day", "App rating", "Search count", "MAU"], a: 0, e: "Store fixed costs are spread over orders. Throughput per store (with ≤10-minute delivery and in-stock rate as inputs) drives profitability." },
+  { q: "Overall conversion fell, but it rose in every city. What's happening?", o: ["A tracking bug", "Simpson's paradox: the traffic mix shifted toward lower-converting cities", "Novelty effect", "Seasonality"], a: 1, e: "When the mix of segments changes, the total can move opposite to every segment. Always segment before concluding." },
+  { q: "AOV fell 8% this week while NOV and orders both grew. What's the most likely read?", o: ["Something is broken", "A cheaper small-basket offering or new users added many smaller orders; probably fine", "Restaurants raised prices", "Payment failures"], a: 1, e: "AOV is a ratio. If total NOV is up, a falling AOV usually means a mix shift toward smaller orders, not a problem." }
+];
+var answered = 0, correct = 0;
+var qList = document.getElementById("quizList");
+qList.innerHTML = QUIZ.map(function (it, i) {
+  return '<div class="qcard" data-i="' + i + '"><h3>' + (i + 1) + '. ' + esc(it.q) + '</h3><div class="opts">' +
+    it.o.map(function (o, j) { return '<button type="button" class="opt" data-j="' + j + '">' + esc(o) + '</button>'; }).join("") +
+    '</div><p class="explain" hidden></p></div>';
+}).join("");
+qList.addEventListener("click", function (e) {
+  var btn = e.target.closest(".opt"); if (!btn) return;
+  var card = btn.closest(".qcard"); if (card.dataset.done) return;
+  var it = QUIZ[+card.dataset.i], j = +btn.dataset.j;
+  card.dataset.done = "1"; answered++;
+  if (j === it.a) correct++;
+  Array.prototype.forEach.call(card.querySelectorAll(".opt"), function (b) {
+    var bj = +b.dataset.j;
+    if (bj === it.a) b.classList.add("right"); else if (bj === j) b.classList.add("wrong");
+    b.disabled = true;
+  });
+  var ex = card.querySelector(".explain"); ex.hidden = false;
+  ex.textContent = (j === it.a ? "Correct. " : "Not quite. ") + it.e;
+  document.getElementById("score").textContent = correct + " / " + answered;
+});
+})();
+</script>
