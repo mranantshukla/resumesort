@@ -3,6 +3,7 @@
 Prep repo for Anant Shukla's Product Analyst interview at Eternal (Gurugram).
 
 - **[5_DAY_PLAN.md](5_DAY_PLAN.md): current plan (OA cleared, interview in 5 days)**
+- **[guesslab/](guesslab/README.md): GuessLab, an interactive app for learning guesstimates and product-analyst skills (run with `cd guesslab && npm install && npm run dev`)**
 - [masterplan.md](masterplan.md): 4-week schedule, topic priorities, SQL/metrics/stats/case content
 - [Interview_Guide/](Interview_Guide/README.md): research on the process, OA, round playbooks, resume defense, question bank
 - [Metrics_Lab/index.html](Metrics_Lab/index.html): interactive metrics guide (atlas of 59 metrics + funnel, retention, unit-economics and A/B simulators + quiz)

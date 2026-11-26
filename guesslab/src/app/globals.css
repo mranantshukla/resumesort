@@ -1,0 +1,151 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Layout concept: a quiet academic notebook inside a working SaaS shell.
+   Cobalt for action, amber for hints, serif for reading content, mono for numbers. */
+:root {
+  --bg: 246 247 249;
+  --surface: 255 255 255;
+  --surface-2: 240 242 246;
+  --ink: 20 23 31;
+  --muted: 91 100 114;
+  --line: 227 230 236;
+  --accent: 43 86 205;
+  --accent-ink: 255 255 255;
+  --accent-soft: 232 238 252;
+  --hint: 166 98 0;
+  --hint-soft: 255 244 224;
+  --good: 22 125 72;
+  --good-soft: 228 245 235;
+  --bad: 190 54 42;
+  --bad-soft: 252 234 231;
+  --warn: 160 96 0;
+  --font-sans: "Instrument Sans", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --font-serif: "Newsreader", "Iowan Old Style", Georgia, serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: 14 16 21;
+    --surface: 22 26 33;
+    --surface-2: 29 34 43;
+    --ink: 231 234 240;
+    --muted: 154 163 178;
+    --line: 41 47 58;
+    --accent: 132 160 255;
+    --accent-ink: 11 16 32;
+    --accent-soft: 29 37 64;
+    --hint: 240 180 90;
+    --hint-soft: 44 35 20;
+    --good: 76 195 138;
+    --good-soft: 20 44 33;
+    --bad: 255 128 110;
+    --bad-soft: 52 26 24;
+    --warn: 240 180 90;
+    color-scheme: dark;
+  }
+}
+
+:root[data-theme="dark"] {
+  --bg: 14 16 21;
+  --surface: 22 26 33;
+  --surface-2: 29 34 43;
+  --ink: 231 234 240;
+  --muted: 154 163 178;
+  --line: 41 47 58;
+  --accent: 132 160 255;
+  --accent-ink: 11 16 32;
+  --accent-soft: 29 37 64;
+  --hint: 240 180 90;
+  --hint-soft: 44 35 20;
+  --good: 76 195 138;
+  --good-soft: 20 44 33;
+  --bad: 255 128 110;
+  --bad-soft: 52 26 24;
+  --warn: 240 180 90;
+  color-scheme: dark;
+}
+
+html,
+body {
+  background: rgb(var(--bg));
+  color: rgb(var(--ink));
+}
+
+body {
+  font-family: var(--font-sans);
+  font-size: 15px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3 {
+  text-wrap: balance;
+}
+
+.prose-read {
+  font-family: var(--font-serif);
+  font-size: 1.06rem;
+  line-height: 1.65;
+}
+
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+.eyebrow {
+  font-size: 0.7rem;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  font-weight: 600;
+  color: rgb(var(--muted));
+}
+
+:focus-visible {
+  outline: 2px solid rgb(var(--accent));
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+input[type="range"] {
+  accent-color: rgb(var(--accent));
+}
+
+.react-flow__attribution {
+  display: none;
+}
+.react-flow__controls button {
+  background: rgb(var(--surface));
+  border-color: rgb(var(--line));
+  color: rgb(var(--ink));
+  fill: rgb(var(--ink));
+}
+.react-flow__edge-path {
+  stroke: rgb(var(--muted) / 0.6);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition: none !important;
+    animation: none !important;
+  }
+}
+
+@keyframes rise {
+  from {
+    opacity: 0.4;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.animate-rise {
+  animation: rise 0.25s ease-out;
+}
