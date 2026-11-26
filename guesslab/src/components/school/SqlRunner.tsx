@@ -12,7 +12,9 @@ let dbPromise: Promise<Database> | null = null;
 function getDb(): Promise<Database> {
   if (!dbPromise) {
     dbPromise = import("sql.js").then(async (mod) => {
-      const SQL = await mod.default({ locateFile: () => "/sql-wasm.wasm" });
+      // The static build sets a relative URL; the Next.js app serves it from /public.
+      const wasmUrl = (typeof window !== "undefined" && (window as unknown as { __SQL_WASM_URL__?: string }).__SQL_WASM_URL__) || "/sql-wasm.wasm";
+      const SQL = await mod.default({ locateFile: () => wasmUrl });
       const db = new SQL.Database();
       db.exec(SQL_SEED);
       return db;

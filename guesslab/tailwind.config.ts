@@ -3,7 +3,7 @@ import type { Config } from "tailwindcss";
 const v = (name: string) => `rgb(var(--${name}) / <alpha-value>)`;
 
 export default {
-  content: ["./src/**/*.{ts,tsx}"],
+  content: ["./src/**/*.{ts,tsx}", "./spa/**/*.{ts,tsx,html}"],
   darkMode: ["class", '[data-theme="dark"]'],
   theme: {
     extend: {

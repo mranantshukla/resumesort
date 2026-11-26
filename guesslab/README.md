@@ -14,6 +14,10 @@ npm run dev        # http://localhost:3000
 
 Production: `npm run build && npm start`. Deploys to Vercel as-is (set the project root to `guesslab/`).
 
+### Static build (no server)
+
+`npm run build:static` produces `dist-spa/`: the same pages and components bundled by Vite into plain files with hash routes (e.g. `#learn--chai-cups-india`), via shims for `next/link` and `next/navigation` in `spa/`. It runs on any static host. The OpenAI route isn't available there, so the built-in coach and interviewer are used. `e2e/static-smoke.cjs` tests it served from a subfolder.
+
 Nothing else is required. Progress is saved in the browser, and the built-in coach and interviewer work without any API key.
 
 ### Optional: OpenAI for the tutor and interviewer
